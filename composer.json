@@ -1,12 +1,12 @@
 {
-    "name": "maq89/paytabs-laravel",
+    "name": "mtgofa/laravel-paytabs",
     "version": "1.0.0",		
-    "license": "LGPL-3.0",
-    "description": "Paytabs Laravel",
+    "license": "MIT",
+    "description": "Laravel Paytabs",
     "authors": [
         {
-            "name": "Musaib Qureshi",
-            "email": "maq.s89@gmail.com"
+            "name": "Mohamed Tarek Gofa",
+            "email": "gofa_25@hotmail.com"
         }
     ],
     "require": {
@@ -14,17 +14,17 @@
     },
     "autoload": {
         "psr-0": {
-            "Damas\\Paytabs": "src/"
+            "MTGofa\\Paytabs": "src/"
         }
     },
     "minimum-stability": "stable",
     "extra": {
         "laravel": {
             "providers": [
-                "Damas\\Paytabs\\PaytabsServiceProvider"
+                "MTGofa\\Paytabs\\PaytabsServiceProvider"
             ],
             "aliases": {
-                "Paytabs": "Damas\\Paytabs\\Facades\\PaytabsFacade"
+                "Paytabs": "MTGofa\\Paytabs\\Facades\\PaytabsFacade"
             }
         }
     }

@@ -1,22 +1,29 @@
 <?php 
 
-namespace Damas\Paytabs;
+namespace MTGofa\Paytabs;
 
 define("TESTING", "https://localhost:8888/paytabs/apiv2/index");
 define("AUTHENTICATION", "https://www.paytabs.com/apiv2/validate_secret_key");
 define("PAYPAGE_URL", "https://www.paytabs.com/apiv2/create_pay_page");
 define("VERIFY_URL", "https://www.paytabs.com/apiv2/verify_payment");
 
-class paytabs {
+class Paytabs {
 
 	private $merchant_id;
+	private $merchant_email;
 	private $merchant_secretKey;
 
+    public function __construct() {
+        $this->merchant_email = env('PAYTABS_EMAIL');
+        $this->merchant_secretKey = env('PAYTABS_SECRETKEY');
+        $this->api_key = "";
+	}
+	
 	public static function getInstance($merchant_email, $merchant_secretKey)
 	{
 		static $inst = null;
 		if ($inst === null) {
-			$inst = new paytabs();
+			$inst = new Paytabs();
 		}
 		$inst->setMerchant($merchant_email, $merchant_secretKey);
 		return $inst;

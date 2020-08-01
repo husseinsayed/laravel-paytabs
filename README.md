@@ -1,17 +1,17 @@
-# Paytabs Laravel
+# Laravel Paytabs
 
 ## Installation
 Begin by installing this package through Composer. Just run following command to terminal-
 
 ```php
-composer require maq89/paytabs-laravel
+composer require mtgofa/laravel-paytabs
 ```
 
 Once this operation completes the package will automatically be discovered for **Laravel 5.6 and above**, otherwise, the final step is to add the service provider. Open `config/app.php`, and add a new item to the providers array.
 ```php
 'providers' => [
 	...
-	Damas\Paytabs\PaytabsServiceProvider::class,
+	MTGofa\Paytabs\PaytabsServiceProvider::class,
 ],
 ```
 
@@ -20,8 +20,14 @@ Now add the alias.
 ```php
 'aliases' => [
 	...
-	'Paytabs' => Damas\Paytabs\Facades\PaytabsFacade::class,
+	'Paytabs' => MTGofa\Paytabs\Facades\PaytabsFacade::class,
 ],
+```
+Don't forget to add your paytabs credentials into your .env file.
+
+```php
+PAYTABS_EMAIL="examply@site.com"
+PAYTABS_SECRETKEY="eKOG1tuN0446VA91KsbV****************"
 ```
 
 

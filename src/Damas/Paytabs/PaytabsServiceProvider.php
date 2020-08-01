@@ -1,6 +1,6 @@
 <?php
 
-namespace Damas\Paytabs;
+namespace MTGofa\Paytabs;
 
 use Illuminate\Support\ServiceProvider;
 

@@ -1,4 +1,4 @@
-<?php namespace Damas\Paytabs\Facades;
+<?php namespace MTGofa\Paytabs\Facades;
 
 use Illuminate\Support\Facades\Facade;
 
