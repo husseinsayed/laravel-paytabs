@@ -10,7 +10,7 @@ class PaytabsFacade extends Facade {
      * @return string
      */
     protected static function getFacadeAccessor() {
-        return 'Paytabs';
+        return 'paytabs';
     }
 
 }
