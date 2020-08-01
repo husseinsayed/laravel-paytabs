@@ -23,7 +23,7 @@ class PaytabsServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton('Paytabs', function() {
+        $this->app->singleton('paytabs', function() {
 			return new Paytabs;
 	    });
     }
