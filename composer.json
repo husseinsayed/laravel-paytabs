@@ -1,8 +1,16 @@
 {
-    "name": "mtgofa/laravel-paytabs",
-    "version": "1.0.0",		
-    "license": "MIT",
+    "name": "mtgofa/laravel-paytabs",		
     "description": "Laravel Paytabs",
+    "license": "MIT",
+    "keywords": [
+        "paytabs",
+        "gateway",
+        "online",
+        "payment",
+        "php",
+        "laravel",
+        "egypt"
+    ],
     "authors": [
         {
             "name": "Mohamed Tarek Gofa",
