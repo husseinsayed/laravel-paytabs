@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Facade;
 
-class PaytabsFacade extends Facade {
+class Paytabs extends Facade {
 
     /**
      * Get the registered name of the component.
