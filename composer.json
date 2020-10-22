@@ -22,7 +22,7 @@
     },
     "autoload": {
         "psr-4": {
-            "MTGofa\\Paytabs": "src/"
+            "MTGofa\\Paytabs\\": "src/"
         }
     },
     "minimum-stability": "stable",
