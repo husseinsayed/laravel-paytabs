@@ -1,104 +1,112 @@
-<?php 
+<?php
 
 namespace MTGofa\Paytabs;
 
-define("TESTING", "https://localhost:8888/paytabs/apiv2/index");
-define("AUTHENTICATION", "https://www.paytabs.com/apiv2/validate_secret_key");
-define("PAYPAGE_URL", "https://www.paytabs.com/apiv2/create_pay_page");
-define("VERIFY_URL", "https://www.paytabs.com/apiv2/verify_payment");
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Route;
 
-class Paytabs {
+class Paytabs
+{
+	private $paytabs_profile_id;
+	private $paytabs_base_url;
+	private $paytabs_server_key;
+	private $paytabs_checkout_lang;
+	private $paytabs_currency;
+	private $verify_route_name;
 
-	private $merchant_id;
-	private $merchant_email;
-	private $merchant_secretKey;
-
-    public function __construct() {
-        $this->merchant_email = env('PAYTABS_EMAIL');
-        $this->merchant_secretKey = env('PAYTABS_SECRETKEY');
-        $this->api_key = "";
-	}
-	
-	public static function getInstance($merchant_email, $merchant_secretKey)
+	public function __construct()
 	{
-		static $inst = null;
-		if ($inst === null) {
-			$inst = new Paytabs();
+		$this->paytabs_profile_id = config('mtgofa-paytabs.PAYTABS_PROFILE_ID');
+		$this->paytabs_base_url = config('mtgofa-paytabs.PAYTABS_BASE_URL');
+		$this->paytabs_server_key = config('mtgofa-paytabs.PAYTABS_SERVER_KEY');
+		$this->paytabs_checkout_lang = config('mtgofa-paytabs.PAYTABS_CHECKOUT_LANG');
+		$this->paytabs_currency = config('mtgofa-paytabs.PAYTABS_CURRENCY');
+		$this->verify_route_name = config('mtgofa-paytabs.VERIFY_ROUTE_NAME');
+	}
+
+	function pay($amount, $user_id = null, $user_name = null, $user_email = null, $user_phone = null, $values = [])
+	{
+		$unique_id = uniqid();
+
+		$data = [
+			'profile_id' => $this->paytabs_profile_id,
+			"tran_type" => "sale",
+			"tran_class" => "ecom",
+			"cart_id" => $unique_id,
+			"cart_currency" => $this->paytabs_currency,
+			"cart_amount" => $amount,
+			"hide_shipping" => true,
+			"cart_description" => "items",
+			"paypage_lang" => $this->paytabs_checkout_lang,
+			"callback" => Route::has($this->verify_route_name) ? route($this->verify_route_name) : "http://localhost?customer_ref=" . $unique_id,
+			"return" => Route::has($this->verify_route_name) ? route($this->verify_route_name) : "http://localhost?customer_ref=" . $unique_id,
+			"customer_ref" => strval($user_id ? $user_id : $unique_id), //convert to string
+			"customer_details" => [
+				"name" => $user_name,
+				"email" => $user_email,
+				"phone" => $user_phone,
+				"street1" => "Not Available Data",
+				"city" => "Not Available Data",
+				"state" => "Not Available Data",
+				"country" => "Not Available Data",
+				"zip" => "00000"
+			],
+			'valu_down_payment' => "0",
+			"tokenise" => 1
+		];
+
+		if (isset($values['customer_details'])) {
+			$data['customer_details'] = array_merge($data['customer_details'], $values['customer_details']);
+			unset($values['customer_details']);
 		}
-		$inst->setMerchant($merchant_email, $merchant_secretKey);
-		return $inst;
+		$data = array_merge($data, $values);
+
+		$response = Http::withHeaders([
+			'Authorization' => $this->paytabs_server_key,
+			'Content-Type' => "application/json"
+		])->post($this->paytabs_base_url . "/payment/request", $data);
+
+		return [
+			'uuid'			=> $unique_id,
+			'payment_id'	=> $response['tran_ref'] ?? NULL,
+			'redirect_url'	=> $response['redirect_url'] ?? NULL,
+			'html'			=> '',
+		];
 	}
 
-	function setMerchant($merchant_email, $merchant_secretKey) {
-		$this->merchant_email = $merchant_email;
-		$this->merchant_secretKey = $merchant_secretKey;
-		$this->api_key = "";
-	}
 
-	function authentication(){
-		$obj = json_decode($this->runPost(AUTHENTICATION, array("merchant_email"=> $this->merchant_email, "merchant_secretKey"=>  $this->merchant_secretKey)));
-		if($obj->access == "granted")
-			$this->api_key = $obj->api_key;
-		else
-			$this->api_key = "";
-		return $this->api_key;
-	}
+	function verify($tran_ref)
+	{
+		$response = Http::withHeaders([
+			'Authorization' => $this->paytabs_server_key,
+			'Content-Type' => "application/json"
+		])->post($this->paytabs_base_url . "/payment/query", [
+			'profile_id' => $this->paytabs_profile_id,
+			'tran_ref' => $tran_ref
+		])->json();
 
-	function create_pay_page($values) {
-		$values['merchant_email']	= $this->merchant_email;
-		$values['secret_key']		= $this->merchant_secretKey;
-		$values['ip_customer']		= $_SERVER['REMOTE_ADDR'];
-		$values['ip_merchant']		= isset($_SERVER['SERVER_ADDR'])? $_SERVER['SERVER_ADDR'] : '::1';
-        $values['msg_lang']         = app()->getLocale()=='ar'?'Arabic':'English';
-		$values['cms_with_version'] = "API with PHP";
-
-        $values['quantity']         = isset($values['quantity'])?$values['quantity']:"1";
-        $values['other_charges']    = isset($values['other_charges'])?$values['other_charges']:"0";
-		$values['discount']         = isset($values['discount'])?$values['discount']:"0";
-
-		$values['currency']         = isset($values['currency'])?$values['currency']:"EGP";
-		$values['country']          = isset($values['country'])?$values['country']:"BHR";
-		$values['country_shipping'] = isset($values['country_shipping'])?$values['country_shipping']:"BHR";
-		
-		return json_decode($this->runPost(PAYPAGE_URL, $values));
-	}
-
-	function send_request(){
-		$values['ip_customer'] = $_SERVER['REMOTE_ADDR'];
-		$values['ip_merchant'] = isset($_SERVER['SERVER_ADDR'])? $_SERVER['SERVER_ADDR'] : '::1';
-		return json_decode($this->runPost(TESTING, $values));
-	}
-
-	function verify_payment($payment_reference){
-		$values['merchant_email'] = $this->merchant_email;
-		$values['secret_key'] = $this->merchant_secretKey;
-		$values['payment_reference'] = $payment_reference;
-		return json_decode($this->runPost(VERIFY_URL, $values));
-	}
-
-	function runPost($url, $fields) {
-		$fields_string = "";
-		foreach ($fields as $key => $value) {
-			$fields_string .= $key . '=' . $value . '&';
+		if (isset($response['payment_result']['response_status']) && $response['payment_result']['response_status'] == "A") {
+			return [
+				'success' => true,
+				'process_data' => $response
+			];
+		} else {
+			return [
+				'success' => false,
+				'process_data' => $response
+			];
 		}
-		rtrim($fields_string, '&');
-		$ch = curl_init();
-		$ip = $_SERVER['REMOTE_ADDR'];
-
-		$ip_address = array(
-			"REMOTE_ADDR" => $ip,
-			"HTTP_X_FORWARDED_FOR" => $ip
-		);
-		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch, CURLOPT_HTTPHEADER, $ip_address);
-		curl_setopt($ch, CURLOPT_POST, count($fields));
-		curl_setopt($ch, CURLOPT_POSTFIELDS, $fields_string);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_REFERER, 1);
-
-		$result = curl_exec($ch);
-		curl_close($ch);
-		return $result;
 	}
 
+	private function associativeMerge(iterable $base, iterable $addition): iterable
+	{
+		foreach ($addition as $key => $sub)
+
+			if (!array_key_exists($key, $base))
+				$base[$key] = $sub;
+			elseif (is_array($base[$key]) && is_array($addition[$key]))
+				$base[$key] = associativeMerge($base[$key], $addition[$key]);
+
+		return $base;
+	}
 }

@@ -13,7 +13,10 @@ class PaytabsServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        $this->publishes([
+            // Config file.
+            __DIR__ . '/config/mtgofa-paytabs.php' => config_path('mtgofa-paytabs.php'),
+        ]);
     }
 
     /**
