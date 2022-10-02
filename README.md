@@ -25,67 +25,41 @@ Now add the alias.
 ```
 Don't forget to add your paytabs credentials into your .env file.
 
+```bash
+$ php artisan vendor:publish --provider="MTGofa\Paytabs\PaytabsServiceProvider"
+```
+Then fill in the credentials in `config/mtgofa-paytabs.php` file if you want instaed of env.
+
 ```php
-PAYTABS_EMAIL="examply@site.com"
-PAYTABS_SECRETKEY="eKOG1tuN0446VA91KsbV****************"
+PAYTABS_PROFILE_ID=2****
+PAYTABS_SERVER_KEY=S6****6D2J-J2Z****H6K-6T2****MW
+PAYTABS_CHECKOUT_LANG=en
+PAYTABS_CURRENCY=EGP
+
+VERIFY_ROUTE_NAME=payment.verify
 ```
 
 
 ## Example:
 ### Create Payment Page:
 ```php
-Route::get('/paytabs_payment', function () {
-    $pt = Paytabs::getInstance("MERCHANT_EMAIL", "SECRET_KEY");
-	$result = $pt->create_pay_page(array(
-		"merchant_email" => "MERCHANT_EMAIL",
-		'secret_key' => "SECRET_KEY",
-		'title' => "John Doe",
-		'cc_first_name' => "John",
-		'cc_last_name' => "Doe",
-		'email' => "customer@email.com",
-		'cc_phone_number' => "973",
-		'phone_number' => "33333333",
-		'billing_address' => "Juffair, Manama, Bahrain",
-		'city' => "Manama",
-		'state' => "Capital",
-		'postal_code' => "97300",
-		'country' => "BHR",
-		'address_shipping' => "Juffair, Manama, Bahrain",
-		'city_shipping' => "Manama",
-		'state_shipping' => "Capital",
-		'postal_code_shipping' => "97300",
-		'country_shipping' => "BHR",
-		"products_per_title"=> "Mobile Phone",
-		'currency' => "BHD",
-		"unit_price"=> "10",
-		'quantity' => "1",
-		'other_charges' => "0",
-		'amount' => "10.00",
-		'discount'=>"0",
-		"msg_lang" => "english",
-		"reference_no" => "1231231",
-		"site_url" => "https://your-site.com",
-		'return_url' => "https://www.mystore.com/paytabs_api/result.php",
-		"cms_with_version" => "API USING PHP"
-	));
-    
-    	if($result->response_code == 4012){
-	    return redirect($result->payment_url);
-        }
-        return $result->result;
+Route::get('payment/paytabs',  function () {
+	$user = auth()->user();
+	$result = Paytabs::pay(10.00, $user->id, $user->name, $user->email, $user->phone, [
+		'customer_details' => [
+			'country' => 'EG',
+			'state' => 'C'
+		]
+	]);
+	return $result;
 });
 ```
 ### Verify Payment:
 ```php
-Route::post('/paytabs_response', function(Request $request){
-    $pt = Paytabs::getInstance("MERCHANT_EMAIL", "SECRET_KEY");
-    $result = $pt->verify_payment($request->payment_reference);
-    if($result->response_code == 100){
-        // Payment Success
-    }
-    return $result->result;
+Route::get('payment/verify/{ref}',  function ($ref) {
+	$result = Paytabs::verify($ref);
+	return $result;
 });
-
 you will need to exclude your paytabs_response route from CSRF protection
 
 ```
