@@ -26,7 +26,7 @@ Now add the alias.
 Don't forget to add your paytabs credentials into your .env file.
 
 ```bash
-$ php artisan vendor:publish --provider="MTGofa\Paytabs\PaytabsServiceProvider"
+php artisan vendor:publish --provider="MTGofa\Paytabs\PaytabsServiceProvider"
 ```
 Then fill in the credentials in `config/mtgofa-paytabs.php` file if you want instaed of env.
 

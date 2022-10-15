@@ -38,8 +38,8 @@ class Paytabs
 			"hide_shipping" => true,
 			"cart_description" => "items",
 			"paypage_lang" => $this->paytabs_checkout_lang,
-			"callback" => Route::has($this->verify_route_name) ? route($this->verify_route_name) : "http://localhost?customer_ref=" . $unique_id,
-			"return" => Route::has($this->verify_route_name) ? route($this->verify_route_name) : "http://localhost?customer_ref=" . $unique_id,
+			"callback" => Route::has($this->verify_route_name) ? route($this->verify_route_name, ['payment_ref' => $unique_id]) : "http://localhost?customer_ref=" . $unique_id,
+			"return" => Route::has($this->verify_route_name) ? route($this->verify_route_name, ['payment_ref' => $unique_id]) : "http://localhost?customer_ref=" . $unique_id,
 			"customer_ref" => strval($user_id ? $user_id : $unique_id), //convert to string
 			"customer_details" => [
 				"name" => $user_name,
