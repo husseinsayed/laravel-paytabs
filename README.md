@@ -4,14 +4,14 @@
 Begin by installing this package through Composer. Just run following command to terminal-
 
 ```php
-composer require mtgofa/laravel-paytabs
+composer require husseinsayed/laravel-paytabs
 ```
 
 Once this operation completes the package will automatically be discovered for **Laravel 5.6 and above**, otherwise, the final step is to add the service provider. Open `config/app.php`, and add a new item to the providers array.
 ```php
 'providers' => [
 	...
-	MTGofa\Paytabs\PaytabsServiceProvider::class,
+	Husseinsayed\Paytabs\PaytabsServiceProvider::class,
 ],
 ```
 
@@ -20,15 +20,15 @@ Now add the alias.
 ```php
 'aliases' => [
 	...
-	'Paytabs' => MTGofa\Paytabs\Facades\PaytabsFacade::class,
+	'Paytabs' => Husseinsayed\Paytabs\Facades\PaytabsFacade::class,
 ],
 ```
 Don't forget to add your paytabs credentials into your .env file.
 
 ```bash
-php artisan vendor:publish --provider="MTGofa\Paytabs\PaytabsServiceProvider"
+php artisan vendor:publish --provider="Husseinsayed\Paytabs\PaytabsServiceProvider"
 ```
-Then fill in the credentials in `config/mtgofa-paytabs.php` file if you want instaed of env.
+Then fill in the credentials in `config/paytabs.php` file if you want instaed of env.
 
 ```php
 PAYTABS_PROFILE_ID=2****
@@ -51,6 +51,35 @@ Route::get('payment/paytabs',  function () {
 			'state' => 'C'
 		]
 	]);
+	return $result;
+});
+```
+### Create Recurring Payment :
+Create Tokenize request in the first payment
+```php
+Route::get('payment/paytabs',  function () {
+	$user = auth()->user();
+	$result = Paytabs::payRecurring(10.00, $user->id, $user->name, $user->email, $user->phone, [
+		'customer_details' => [
+			'country' => 'EG',
+			'state' => 'C'
+		]
+	],2);
+	return $result;
+});
+```
+
+```php
+Route::get('payment/paytabs',  function () {
+	$user = auth()->user();
+	$recurring_token=$token;//token returned from the previous request
+  $recurring_tranRef=$tran_ref;//tran_ref returned from the previous request
+	$result = Paytabs::payRecurring(10.00, $user->id, $user->name, $user->email, $user->phone, [
+		'customer_details' => [
+			'country' => 'EG',
+			'state' => 'C'
+		]
+	],1,'recurring',$recurring_token,$recurring_tranRef);
 	return $result;
 });
 ```

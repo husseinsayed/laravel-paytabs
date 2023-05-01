@@ -1,4 +1,6 @@
-<?php namespace MTGofa\Paytabs\Facades;
+<?php
+
+namespace Husseinsayed\Paytabs\Facades;
 
 use Illuminate\Support\Facades\Facade;
 

@@ -1,9 +1,10 @@
 {
-    "name": "mtgofa/laravel-paytabs",
+    "name": "husseinsayed/laravel-paytabs",
     "description": "Laravel Paytabs",
     "license": "MIT",
     "keywords": [
         "paytabs",
+        "recurring",
         "gateway",
         "online",
         "payment",
@@ -13,8 +14,8 @@
     ],
     "authors": [
         {
-            "name": "Mohamed Tarek Gofa",
-            "email": "gofa_25@hotmail.com"
+            "name": "Hussein Sayed",
+            "email": "hussein.sayed@bu.edu.eg"
         }
     ],
     "require": {
@@ -22,17 +23,17 @@
     },
     "autoload": {
         "psr-4": {
-            "MTGofa\\Paytabs\\": "src/"
+            "Husseinsayed\\Paytabs\\": "src/"
         }
     },
     "minimum-stability": "stable",
     "extra": {
         "laravel": {
             "providers": [
-                "MTGofa\\Paytabs\\PaytabsServiceProvider"
+                "Husseinsayed\\Paytabs\\PaytabsServiceProvider"
             ],
             "aliases": {
-                "Paytabs": "MTGofa\\Paytabs\\Facades\\PaytabsFacade"
+                "Paytabs": "Husseinsayed\\Paytabs\\Facades\\PaytabsFacade"
             }
         }
     }

@@ -1,6 +1,5 @@
 <?php
-
-namespace MTGofa\Paytabs;
+namespace Husseinsayed\Paytabs;
 
 use Illuminate\Support\ServiceProvider;
 
@@ -15,7 +14,7 @@ class PaytabsServiceProvider extends ServiceProvider
     {
         $this->publishes([
             // Config file.
-            __DIR__ . '/config/mtgofa-paytabs.php' => config_path('mtgofa-paytabs.php'),
+            __DIR__ . '/config/paytabs.php' => config_path('paytabs.php'),
         ]);
     }
 
